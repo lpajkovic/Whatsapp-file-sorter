@@ -18,6 +18,10 @@ class WappBatch:
         self.labelPath.grid(row=0, column=1, padx=5, pady=5)
         
         self.items=[]
+        self.file_extensions={
+            ".jpg" : "Images",
+            ".mp4" : "Videos"
+            }
         
         self.copyButton=Button(root, text="Copy files", command=lambda:self.execute("copy"))
         self.copyButton.grid(row=1, column=2, padx=5, pady=5)
@@ -25,8 +29,11 @@ class WappBatch:
         self.moveButton=Button(root, text="Move files", command=lambda:self.execute("move"))
         self.moveButton.grid(row=1, column=4, padx=5, pady=5)
         
+        
+        
     def YM_extract(self,filename):
-        search_pattern=r"IMG_(\d{4})(\d{2})"
+        search_pattern=r"....(\d{4})(\d{2})"
+        
         match=re.search(search_pattern,filename)
     
         #returns year and month
@@ -66,18 +73,29 @@ class WappBatch:
             year, month=self.YM_extract(item)
             item_path=os.path.join(self.src_dir.get(), item)
             year_path=self.create_folder(year, self.src_dir.get())
-            month_path=self.create_folder(month, year_path)
-    
-            if item.endswith(".jpg"):
+            
+            if item is not None:
+                ext=None
+                for possible_ext in self.file_extensions.keys():
+                    if item.endswith(possible_ext):
+                        ext=possible_ext
+                        break
+                
+                
+                folder_type=self.create_folder(self.file_extensions[ext], year_path)
+                month_path=self.create_folder(month, folder_type)
                 if(operation=="move"):
                     shutil.move(item_path, month_path)
                 if(operation=="copy"):
                     shutil.copy2(item_path, month_path)
+            
+                
                     
         os.startfile(self.src_dir.get())
 
 window=Tk()
 app=WappBatch(window)
+window.resizable(width=False, height=False)
 window.mainloop()
         
                 
